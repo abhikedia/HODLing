@@ -26,7 +26,7 @@ The penalies are charged based on the amount deposited and number of days remain
 The rewards has to be significantly lesser than the penalties. The rewards are given for the extra days deposit was present in the contract at the rate of 0.0001% of the amount collected on penalties (per day, at the date of withdrawal). For example, if the holding got matured on Oct 10, 2020 and the user tries to withdraw on Oct 20, 2020 and the amount present in penalties is 10 ETH, thr rewards will be given on 10 ETH for 10 days.
 Since this amount can be huge as well making the penalties funds draining faster, there is an upper limit of 0.00005 ETH per day. This means, the reward will be minimum(0.00005 ETH, 0.0001%) per day.
 
-## Function Descriptions
+## Functions Description
 1. Lock()- To create a new holding for specified number of days.
 2. getAmount()- To check amount of holding in case a person looses transaction id.
 3. getLastId()- In web3, its not possible to return a value from a function called using send. So this function needs to be called simultaneously every time Lock() is called. It returns id of last holding.
