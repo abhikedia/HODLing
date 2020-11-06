@@ -2,6 +2,8 @@ pragma solidity >0.5.0<=0.6.0;
 
 contract HODLing
 {
+    event transferred(uint amount, address user);
+
     uint penalties=0;                                                                   //to keep track of how much penalty was imposed.
     address owner;
 
@@ -20,13 +22,23 @@ contract HODLing
     mapping(address=>uint16) counter;                                                   //for unique id of every holding created by a user.
     mapping(address=>mapping(uint16=>bool)) marker;                                     //to check whether a holding is still active.
 
-    function Lock(uint _time) public payable returns(uint)                              //to create a new holding, returns unique id of holding
+    function Lock(uint _time) public payable                                            //to create a new holding, returns unique id of holding
     {
         require(msg.value>0 wei);
+        require(_time>0);
         uint16 temp=++counter[msg.sender];
         holdings[msg.sender][temp]=HOLD(now,now+(_time*1 days),msg.value*(10**18));
         marker[msg.sender][temp]=true;
-        return temp;
+    }
+
+    function getAmount(uint16 _id) public view returns(uint)                            //to be executed if a person looses transaction id.
+    {
+        return holdings[msg.sender][_id].amount;
+    }
+
+    function getLastId() public view returns(uint16)
+    {
+        return counter[msg.sender];
     }
 
     function checkTime(uint16 _id) public view returns(uint)                            //to check the return time
@@ -35,7 +47,7 @@ contract HODLing
         return holdings[msg.sender][_id].mature_time;
     }
 
-    function Withdraw(uint16 _id) public payable returns(uint)                          //returns the amount received
+    function Withdraw(uint16 _id) public payable
     {
         require(marker[msg.sender][_id]);
         marker[msg.sender][_id]=false;  
@@ -58,7 +70,7 @@ contract HODLing
                 penalties-=_amount;
     
             msg.sender.call.value(_amount+holdings[msg.sender][_id].amount);
-            return penalties+holdings[msg.sender][_id].amount;
+            emit transferred(_amount+holdings[msg.sender][_id].amount,msg.sender);
         }
         else                                                                            //The user has to be penalised.
         {
@@ -70,7 +82,7 @@ contract HODLing
 
             penalties+=_amount;
             msg.sender.call.value(holdings[msg.sender][_id].amount-_amount);
-            return holdings[msg.sender][_id].amount-_amount;
+            emit transferred(holdings[msg.sender][_id].amount-_amount,msg.sender);
         }
     }
 
