@@ -4,6 +4,17 @@ const truffleAssert = require('truffle-assertions');
 const json = require('../build/contracts/HODLing.json');
 const interface = json['abi'];
 const bytecode = json['bytecode'];
+const BigNumber = require('bignumber.js');
+const jsonrpc = '2.0'
+
+const id = 0
+const send = (method, params = []) =>
+    web3.currentProvider.send({ id, jsonrpc, method, params })
+
+const timeTravel = async seconds => {
+    await send('evm_increaseTime', [seconds])
+    await send('evm_mine')
+}
 
 contract('HODLing', async () => {
 
@@ -22,13 +33,15 @@ contract('HODLing', async () => {
 
     it('Value of contract balance should be 0 before any transaction', async () => {
         let amount = await hodlingtest.methods.getBalance().call({ from: accounts[0] });
-        assert(amount === 0);
+        assert(amount.toString() === '0');
     });
 
     it('Lock Asset(With value greater than 0)', async () => {
         await hodlingtest.methods.Lock(5).send({ from: accounts[2], value: web3.utils.toWei('1', 'ether'), gas: 1000000 });
         let id = await hodlingtest.methods.getLastId().call({ from: accounts[2] });
-        assert(id === 1);
+        id = new BigNumber(id);
+        let z=new BigNumber(1);
+        assert(id.toString() === z.toString(),'id is not 1');
     });
 
     it('Lock Asset(With value 0) should revert', async () => {
@@ -51,7 +64,7 @@ contract('HODLing', async () => {
 
     it('Value of penalties should be 0 before any penalty is put', async () => {
         let amount = await hodlingtest.methods.getPenalties().call({ from: accounts[0] });
-        assert(amount === 0);
+        assert(amount.toString() === '0');
     });
 
     it('Value of contract balance should not be 0 after transaction', async () => {
@@ -71,4 +84,8 @@ contract('HODLing', async () => {
     it('Withdrawing more than once from same address and id should revert', async () => {
         await truffleAssert.reverts(hodlingtest.methods.Withdraw(1).send({ from: accounts[2] }));
     });
+
+    // it('Withdrawing balance after maturity period', async () => {
+    //     console.log(await timeTravel(10*24*60*60));
+    // });
 });
