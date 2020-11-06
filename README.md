@@ -14,5 +14,5 @@ The rewards can be given to user if he is withdrawing the amount after the holdi
 To make the system foolproof, the rewards given per day should be much smaller when compared to the penalties charged. 
 
 The penalies charged are based on the amount deposited and number of days remaining from the date of withdrawal. The penalties are charged at the rate of 0.001% per day. But this amount can be large for huge deposits which might not be suitable for the holder. So there is a cap value of 0.0001 ETH per day, whichever is smaller.
-<br>
+<br><br>
 The rewards has to be significantly lesser than the penalties. The rewards are given for the extra days deposit was present in the contract at the rate of 0.0001% of the amount collected on penalties (per day, at the date of withdrawal). Since this amount can be huge as well making the penalties funds draining faster, there is an upper limit of 0.00005 ETH per day.
